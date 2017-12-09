@@ -9,7 +9,6 @@ Module for extracting Twitter data to MongoDB databases
 
 [![npm version](https://badge.fury.io/js/twitter2mongodb.svg)](https://badge.fury.io/js/twitter2mongodb)
 [![Build Status](https://travis-ci.org/rrwen/twitter2mongodb.svg?branch=master)](https://travis-ci.org/rrwen/twitter2mongodb)
-[![Coverage Status](https://coveralls.io/repos/github/rrwen/twitter2mongodb/badge.svg?branch=master)](https://coveralls.io/github/rrwen/twitter2mongodb?branch=master)
 [![npm](https://img.shields.io/npm/dt/twitter2mongodb.svg)](https://www.npmjs.com/package/twitter2mongodb)
 [![GitHub license](https://img.shields.io/github/license/rrwen/twitter2mongodb.svg)](https://github.com/rrwen/twitter2mongodb/blob/master/LICENSE)
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/rrwen/twitter2mongodb.svg?style=social)](https://twitter.com/intent/tweet?text=Module%20for%20extracting%20Twitter%20data%20to%20MongoDB%20databases:%20https%3A%2F%2Fgithub.com%2Frrwen%2Ftwitter2mongodb%20%23nodejs%20%23npm)
