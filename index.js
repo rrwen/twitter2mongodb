@@ -48,6 +48,7 @@ var Twitter = require('twitter');
  * @param {Object} [options.mongodb={}] contains options for queries in {@link https://www.npmjs.com/package/mongodb mongodb}.
  * @param {string} [options.mongodb.connection=process.env.MONGODB_CONNECTION || 'mongodb://localhost:27017'] MongoDB {@link https://docs.mongodb.com/manual/reference/connection-string/ connection string}.
  * @param {string} [options.mongodb.collection=process.env.MONGODB_COLLECTION || 'twitter_data'] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} name.
+ * @param {Object} [options.mongodb.options={}] Mongodb client {@link http://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#.connect connect options}.
  * @param {string} [options.jsonata=process.env.JSONATA] {@link https://www.npmjs.com/package/jsonata jsonata} query for the received tweet object in JSON format before inserting into the MongoDB collection (`options.mongodb.collection`).
  * @param {Object} [options.stream={}] options for the returned {@link  https://www.npmjs.com/package/twitter#streaming-api Twitter stream}.
  * @param {function} [options.stream.callback=function(err, data){}] callback function on a stream 'data' event.
@@ -73,8 +74,7 @@ var Twitter = require('twitter');
  * * `data.twitter.client`: contains a {@link https://www.npmjs.com/package/twitter Twitter client} object created from `options.twitter.connection`  
  * * `data.twitter.tweets`: contains the {@link https://www.npmjs.com/package/twitter tweets} in JSON format  
  * * `data.mongodb.client`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient client} from `options.mongodb.connection`  
- * * `data.mongodb.results`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult query results} of `options.mongodb.query`  
- *
+ * * `data.mongodb.results`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult query results} of `options.mongodb.query`
  *
  * @example
  * var twitter2mongodb = require('../index.js');

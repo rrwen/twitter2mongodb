@@ -42,9 +42,16 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
     t.comment('Developer: ' + devPackages.join(', '));
 	t.comment('Optional:' + optionalPackages.join(','));
 	
-	// (test_connect) Connect to database
-	MongoClient.connect(process.env.MONGODB_CONNECTION)
+	// (test_connect) Connect to test database
+	MongoClient.connect(process.env.MONGODB_CONNECTION, function(err, db) {
+		if (err) {
+			t.fail('(MAIN) MongoDB test connect: ' + err.message);
+			collection = db.collection(process.env.MONGODB_COLLECTION);
+		}
+		t.pass('(MAIN) MongoDB test connect');
+	});
 	
-	// (test_create) Create test database
+	//
+	
 	t.end();
 });
