@@ -1,8 +1,12 @@
 // Richard Wen
 // rrwen.dev@gmail.com
 
+var jsonata = require("jsonata");
+var MongoClient = require('mongodb').MongoClient;
+var Twitter = require('twitter');
+
 /**
- * Description.
+ * Extract data from the Twitter Application Programming Interface (API) to a MongoDB collection.
  *
  * * {@link https://docs.mongodb.com/ MongoDB Database Documentation}
  * * {@link https://developer.twitter.com/en/docs Twitter Developer Documentation}
@@ -30,45 +34,30 @@
  * 4. Click on your created application
  * 5. Click on **Keys and Access Tokens**
  * 6. Keep note of the following:
- * 	* **Consumer Key (API Key)**
- * 	* **Consumer Secret (API Secret)**
- * 	* **Access Token**
- * 	* **Access Token Secret**
+ *
+ * * **Consumer Key (API Key)**
+ * * **Consumer Secret (API Secret)**
+ * * **Access Token**
+ * * **Access Token Secret**
  *
  * @param {string} [options.twitter.connection.consumer_key=process.env.TWITTER_CONSUMER_KEY] Twitter API **Consumer Key (API Key)**.
  * @param {string} [options.twitter.connection.consumer_secret=process.env.TWITTER_CONSUMER_SECRET] Twitter API **Consumer Secret (API Secret)**.
  * @param {string} [options.twitter.connection.access_token_key=process.env.TWITTER_ACCESS_TOKEN_KEY] Twitter API **Access Token Key**.
  * @param {string} [options.twitter.connection.access_token_secret=process.env.TWITTER_ACCESS_TOKEN_SECRET] Twitter API **Access Token Secret**.
  * @param {string} [options.twitter.connection.bearer_token=process.env.TWITTER_BEARER_TOKEN] Twitter API **Bearer Token**.
- * @param {Object} [options.pg={}] contains options for queries in {@link https://www.npmjs.com/package/mongodb mongodb}.
- * @param {string} [options.pg.table=process.env.PGTABLE || 'twitter2pg_table'] PostgreSQL table name.
- * @param {string} [options.pg.column=process.env.PGCOLUMN || 'tweets'] PostgreSQL column name for `options.pg.table`.
- *
- * * Column must be a {@link https://www.postgresql.org/docs/9.4/static/datatype-json.html Javascript Object Notation (JSON) type}
- *
- * @param {string} [options.pg.query=process.env.PGQUERY || 'INSERT INTO $options.pg.table ($options.pg.column) VALUES ($1);'] PostgreSQL parameterized query to insert Twitter data in JSON format.
- *
- * * `$options.pg.table` is the value set in `options.pg.table`
- * * `$options.pg. column` is the value set in `options.pg.column`
- * * `$1` is the Twitter data in JSON format
- *
- * @param {Object} [options.pg.connection={}] PostgreSQL connection details.
- *
- * @param {string} [options.pg.host=process.env.PGHOST || 'localhost'] **Host** address of PostgreSQL instance.
- * @param {number} [options.pg.port=process.env.PGPORT || 5432] **Port** number of PostgreSQL instance.
- * @param {number} [options.pg.database=process.env.PGDATABASE|| process.env.PGUSER || process.env.USER || 'postgres'] **Database** name for PostgreSQL instance.
- * @param {string} [options.pg.user=process.env.PGUSER || process.env.USER || 'postgres'] **User** name for PostgreSQL instance.
- * @param {string} [options.pg.password=process.env.PGPASSWORD] **Password** of user for PostgreSQL instance.
- * @param {string} [options.jsonata=process.env.JSONATA] {@link https://www.npmjs.com/package/jsonata jsonata} query for the recieved tweet object in JSON format before inserting into the PostgreSQL table (`options.pg.table`).
+ * @param {Object} [options.mongodb={}] contains options for queries in {@link https://www.npmjs.com/package/mongodb mongodb}.
+ * @param {string} [options.mongodb.connection=process.env.MONGODB_CONNECTION || 'mongodb://localhost:27017'] MongoDB {@link https://docs.mongodb.com/manual/reference/connection-string/ connection string}.
+ * @param {string} [options.mongodb.collection=process.env.MONGODB_COLLECTION || 'twitter_data'] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} name.
+ * @param {string} [options.jsonata=process.env.JSONATA] {@link https://www.npmjs.com/package/jsonata jsonata} query for the received tweet object in JSON format before inserting into the MongoDB collection (`options.mongodb.collection`).
  * @param {Object} [options.stream={}] options for the returned {@link  https://www.npmjs.com/package/twitter#streaming-api Twitter stream}.
  * @param {function} [options.stream.callback=function(err, data){}] callback function on a stream 'data' event.
  *
  * * `err` is the {@link Error} object
- * * `data` is in the form of `{twitter: {stream: stream, tweets: Object}, pg: {client: Object, results: Object}}`
+ * * `data` is in the form of `{twitter: {stream: stream, tweets: Object}, mongodb: {client: Object, results: Object}}`
  * * `data.twitter.stream` is the {@link https://www.npmjs.com/package/twitter#streaming-api twitter stream}
  * * `data.twitter.tweets` are  the {@link https://www.npmjs.com/package/twitter tweets} in JSON format
- * * `data.pg.client` is the PostgreSQL {@link https://node-postgres.com/features/connecting client} from `options.pg.connection`
- * * `data.pg.results` is the PostgreSQL {@link https://node-postgres.com/features/queries query results} of `options.pg.query`
+ * * `data.mongodb.client` is the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient client} from `options.mongodb.connection`
+ * * `data.mongodb.results` is the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult query results} of `options.mongodb.query`
  *
  * @returns {(Promise|stream)} Returns a stream if `options.twitter.method` is 'stream', otherwise returns a Promise:
  *
@@ -80,11 +69,11 @@
  *
  * **Else** 
  * 
- * * Return a {@link Promise} object that resolves a `data` object in the form `{twitter: {client: ..., tweets: ...}, pg: {client: ..., results: ...}}`  
+ * * Return a {@link Promise} object that resolves a `data` object in the form `{twitter: {client: ..., tweets: ...}, mongodb: {client: ..., results: ...}}`  
  * * `data.twitter.client`: contains a {@link https://www.npmjs.com/package/twitter Twitter client} object created from `options.twitter.connection`  
  * * `data.twitter.tweets`: contains the {@link https://www.npmjs.com/package/twitter tweets} in JSON format  
- * * `data.pg.client`: contains the PostgreSQL {@link https://node-postgres.com/features/connecting client} from `options.pg.connection`  
- * * `data.pg.results`: contains the PostgreSQL {@link https://node-postgres.com/features/queries query results} of `options.pg.query`  
+ * * `data.mongodb.client`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient client} from `options.mongodb.connection`  
+ * * `data.mongodb.results`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult query results} of `options.mongodb.query`  
  *
  *
  * @example

@@ -56,7 +56,7 @@
   </div>
   
 
-  <p>Description.</p>
+  <p>Extract data from the Twitter Application Programming Interface (API) to a MongoDB collection.</p>
 <ul>
 <li><a href="https://docs.mongodb.com/">MongoDB Database Documentation</a></li>
 <li><a href="https://developer.twitter.com/en/docs">Twitter Developer Documentation</a></li>
@@ -168,16 +168,14 @@
 <li>Go to your <a href="https://apps.twitter.com/">applications</a></li>
 <li>Click on your created application</li>
 <li>Click on <strong>Keys and Access Tokens</strong></li>
-<li>
-<p>Keep note of the following:</p>
+<li>Keep note of the following:</li>
+</ol>
 <ul>
 <li><strong>Consumer Key (API Key)</strong></li>
 <li><strong>Consumer Secret (API Secret)</strong></li>
 <li><strong>Access Token</strong></li>
 <li><strong>Access Token Secret</strong></li>
 </ul>
-</li>
-</ol>
 </span></td>
 </tr>
 
@@ -254,7 +252,7 @@
 
               
                 <tr>
-  <td class='break-word'><span class='code bold'>options.pg</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
+  <td class='break-word'><span class='code bold'>options.mongodb</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
   
     (default <code>{}</code>)
   </td>
@@ -266,114 +264,26 @@
 
   
     <tr>
-  <td class='break-word'><span class='code bold'>options.pg.table</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>options.mongodb.connection</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   
-    (default <code>process.env.PGTABLE||&#39;twitter2pg_table&#39;</code>)
+    (default <code>process.env.MONGODB_CONNECTION||&#39;mongodb://localhost:27017&#39;</code>)
   </td>
-  <td class='break-word'><span>PostgreSQL table name.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.pg.column</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>process.env.PGCOLUMN||&#39;tweets&#39;</code>)
-  </td>
-  <td class='break-word'><span>PostgreSQL column name for 
-<code>options.pg.table</code>
+  <td class='break-word'><span>MongoDB 
+<a href="https://docs.mongodb.com/manual/reference/connection-string/">connection string</a>
 .
-<ul>
-<li>Column must be a <a href="https://www.postgresql.org/docs/9.4/static/datatype-json.html">Javascript Object Notation (JSON) type</a></li>
-</ul>
 </span></td>
 </tr>
 
 
   
     <tr>
-  <td class='break-word'><span class='code bold'>options.pg.query</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  <td class='break-word'><span class='code bold'>options.mongodb.collection</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   
-    (default <code>process.env.PGQUERY||&#39;INSERT INTO $options.pg.table ($options.pg.column) VALUES ($1);&#39;</code>)
+    (default <code>process.env.MONGODB_COLLECTION||&#39;twitter_data&#39;</code>)
   </td>
-  <td class='break-word'><span>PostgreSQL parameterized query to insert Twitter data in JSON format.
-<ul>
-<li><code>$options.pg.table</code> is the value set in <code>options.pg.table</code></li>
-<li><code>$options.pg. column</code> is the value set in <code>options.pg.column</code></li>
-<li><code>$1</code> is the Twitter data in JSON format</li>
-</ul>
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.pg.connection</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
-  
-    (default <code>{}</code>)
-  </td>
-  <td class='break-word'><span>PostgreSQL connection details.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.pg.host</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>process.env.PGHOST||&#39;localhost&#39;</code>)
-  </td>
-  <td class='break-word'><span><strong>Host</strong>
- address of PostgreSQL instance.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.pg.port</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
-  
-    (default <code>process.env.PGPORT||5432</code>)
-  </td>
-  <td class='break-word'><span><strong>Port</strong>
- number of PostgreSQL instance.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.pg.database</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></code>
-  
-    (default <code>process.env.PGDATABASE||process.env.PGUSER||process.env.USER||&#39;postgres&#39;</code>)
-  </td>
-  <td class='break-word'><span><strong>Database</strong>
- name for PostgreSQL instance.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.pg.user</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>process.env.PGUSER||process.env.USER||&#39;postgres&#39;</code>)
-  </td>
-  <td class='break-word'><span><strong>User</strong>
- name for PostgreSQL instance.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.pg.password</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>process.env.PGPASSWORD</code>)
-  </td>
-  <td class='break-word'><span><strong>Password</strong>
- of user for PostgreSQL instance.
+  <td class='break-word'><span>Mongodb 
+<a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection">collection</a>
+ name.
 </span></td>
 </tr>
 
@@ -388,8 +298,8 @@
     (default <code>process.env.JSONATA</code>)
   </td>
   <td class='break-word'><span><a href="https://www.npmjs.com/package/jsonata">jsonata</a>
- query for the recieved tweet object in JSON format before inserting into the PostgreSQL table (
-<code>options.pg.table</code>
+ query for the received tweet object in JSON format before inserting into the MongoDB collection (
+<code>options.mongodb.collection</code>
 ).
 </span></td>
 </tr>
@@ -416,11 +326,11 @@
   <td class='break-word'><span>callback function on a stream 'data' event.
 <ul>
 <li><code>err</code> is the <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a> object</li>
-<li><code>data</code> is in the form of <code>{twitter: {stream: stream, tweets: Object}, pg: {client: Object, results: Object}}</code></li>
+<li><code>data</code> is in the form of <code>{twitter: {stream: stream, tweets: Object}, mongodb: {client: Object, results: Object}}</code></li>
 <li><code>data.twitter.stream</code> is the <a href="https://www.npmjs.com/package/twitter#streaming-api">twitter stream</a></li>
 <li><code>data.twitter.tweets</code> are  the <a href="https://www.npmjs.com/package/twitter">tweets</a> in JSON format</li>
-<li><code>data.pg.client</code> is the PostgreSQL <a href="https://node-postgres.com/features/connecting">client</a> from <code>options.pg.connection</code></li>
-<li><code>data.pg.results</code> is the PostgreSQL <a href="https://node-postgres.com/features/queries">query results</a> of <code>options.pg.query</code></li>
+<li><code>data.mongodb.client</code> is the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient">client</a> from <code>options.mongodb.connection</code></li>
+<li><code>data.mongodb.results</code> is the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult">query results</a> of <code>options.mongodb.query</code></li>
 </ul>
 </span></td>
 </tr>
@@ -455,11 +365,11 @@
 </ul>
 <p><strong>Else</strong> </p>
 <ul>
-<li>Return a <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> object that resolves a <code>data</code> object in the form <code>{twitter: {client: ..., tweets: ...}, pg: {client: ..., results: ...}}</code>  </li>
+<li>Return a <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> object that resolves a <code>data</code> object in the form <code>{twitter: {client: ..., tweets: ...}, mongodb: {client: ..., results: ...}}</code>  </li>
 <li><code>data.twitter.client</code>: contains a <a href="https://www.npmjs.com/package/twitter">Twitter client</a> object created from <code>options.twitter.connection</code>  </li>
 <li><code>data.twitter.tweets</code>: contains the <a href="https://www.npmjs.com/package/twitter">tweets</a> in JSON format  </li>
-<li><code>data.pg.client</code>: contains the PostgreSQL <a href="https://node-postgres.com/features/connecting">client</a> from <code>options.pg.connection</code>  </li>
-<li><code>data.pg.results</code>: contains the PostgreSQL <a href="https://node-postgres.com/features/queries">query results</a> of <code>options.pg.query</code></li>
+<li><code>data.mongodb.client</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient">client</a> from <code>options.mongodb.connection</code>  </li>
+<li><code>data.mongodb.results</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult">query results</a> of <code>options.mongodb.query</code></li>
 </ul>
 
       
