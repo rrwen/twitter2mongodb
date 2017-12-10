@@ -1,0 +1,11 @@
+TAP version 13
+# Tests for twitter2mongodb (0.0.0)
+# Node.js (v7.9.0)
+# Description: Module for extracting Twitter data to MongoDB databases
+# Date: 2017-12-10 06:32:59
+# Dependencies: jsonata (^1.4.1), mongodb (^3.0.0-rc0), twitter (^1.7.1)
+# Developer: documentation (^5.3.3), dotenv (^4.0.0), moment (^2.19.1), tape (^4.8.0)
+ok 1 (MAIN) MongoDB connect
+# (A) tests on Twitter REST API
+ok 2 (A) GET search/tweets to insertOne
+ok 3 (MAIN) MongoDB drop database

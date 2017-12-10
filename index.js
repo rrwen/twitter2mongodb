@@ -2,8 +2,9 @@
 // rrwen.dev@gmail.com
 
 var jsonata = require("jsonata");
-var mongoClient = require('mongodb').MongoClient;
 var Twitter = require('twitter');
+
+const Client = require('mongodb').MongoClient;
 
 /**
  * Extract data from the Twitter Application Programming Interface (API) to a MongoDB collection.
@@ -46,7 +47,8 @@ var Twitter = require('twitter');
  * @param {string} [options.twitter.connection.access_token_secret=process.env.TWITTER_ACCESS_TOKEN_SECRET] Twitter API **Access Token Secret**.
  * @param {string} [options.twitter.connection.bearer_token=process.env.TWITTER_BEARER_TOKEN] Twitter API **Bearer Token**.
  * @param {Object} [options.mongodb={}] contains options for methods in {@link https://www.npmjs.com/package/mongodb mongodb}.
- * @param {string} [options.mongodb.connection=process.env.MONGODB_CONNECTION || 'mongodb://localhost:27017/test'] MongoDB {@link https://docs.mongodb.com/manual/reference/connection-string/ connection string}.
+ * @param {string} [options.mongodb.connection=process.env.MONGODB_CONNECTION || 'mongodb://localhost:27017'] MongoDB {@link https://docs.mongodb.com/manual/reference/connection-string/ connection string}.
+ * @param {string} [options.mongodb.database=process.env.MONGODB_DATABASE || 'test'] MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Db database name}.
  * @param {string} [options.mongodb.collection=process.env.MONGODB_COLLECTION || 'twitter_data'] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} name.
  * @param {string|Object} [options.mongodb.options=process.env.MONGODB_OPTIONS] Mongodb client {@link https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#.connect connect options}.
   * @param {string} [options.mongodb.method=process.env.MONGODB_METHOD||'insertOne'] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} method.
@@ -89,7 +91,7 @@ var Twitter = require('twitter');
  * // (options) Initialize options object
  * var options = {
  * 	twitter: {},
- * 	pg: {}
+ * 	mongodb: {}
  * };
  *
  * // *** CONNECTION SETUP ***
@@ -109,11 +111,9 @@ var Twitter = require('twitter');
  * // *** SEARCH TWEETS ***
  *
  * // (options_twitter_rest) Search for keyword 'twitter' in path 'GET search/tweets'
- * options.twitter = {
- * 	method: 'get', // get, post, or stream
- * 	path: 'search/tweets', // api path
- * 	params: {q: 'twitter'} // query tweets
- * };
+ * options.twitter.method = 'get'; // get, post, or stream
+ * options.twitter.path = 'search/tweets'; // api path
+ * options.twitter.params = {q: 'twitter'}; // query tweets
  *
  * // (options_jsonata) Filter for statuses array using jsonata
  * options.jsonata = 'statuses';
@@ -132,11 +132,9 @@ var Twitter = require('twitter');
  * // *** STREAM TWEETS ***
  *
  * // (options_twitter_connection) Track keyword 'twitter' in path 'POST statuses/filter'
- * options.twitter = {
- * 	method: 'stream',
- * 	path: 'statuses/filter',
- * 	params: {track: 'twitter'}
- * };
+ * options.twitter.method = 'stream'; // get, post, or stream
+ * options.twitter.path = 'statuses/filter'; // api path
+ * options.twitter.params = {track: 'twitter'}; // query tweets
  *
  * // (options_mongodb) MongoDB options
  * options.mongodb.method = 'insertOne';
@@ -180,6 +178,7 @@ module.exports = options => {
 	// (mongodb_defaults) Default options for mongodb
 	options.mongodb = options.mongodb || {};
 	options.mongodb.connection = options.mongodb.connection || process.env.MONGODB_CONNECTION || 'mongodb://localhost:27017/test';
+	options.mongodb.database = options.mongodb.database || process.env.MONGODB_DATABASE || 'test';
 	options.mongodb.collection = options.mongodb.collection || process.env.MONGODB_COLLECTION || 'twitter_data';
 	options.mongodb.options = options.mongodb.options || process.env.MONGODB_OPTIONS;
 	options.mongodb.method = options.mongodb.method || process.env.MONGODB_METHOD || 'insertOne';
@@ -192,9 +191,9 @@ module.exports = options => {
 	}
 	
 	// (mongodb_connect) Connection options for mongodb
-	var mongoDB, mongoCollection;
+	var mongoClient, mongoDB, mongoCollection;
 	if (typeof options.mongodb.connection == 'string') {
-		mongoClient.connect(function(err, db) {
+		Client.connect(options.mongodb.connection, function(err, client) {
 			
 			// (mongodb_connect_error) Unable to connect
 			if (err) {
@@ -202,11 +201,12 @@ module.exports = options => {
 			}
 			
 			// (mongodb_connect_pool) Create mongodb client pool
-			mongoDB = db;
-			if (options.mongodb.collection instanceof db.collection) {
+			mongoClient = client;
+			mongoDB = client.db(options.mongodb.database);
+			if (options.mongodb.collection instanceof mongoDB.collection) {
 				mongoCollection = options.mongodb.collection;
 			} else {
-				mongoCollection = db.collection(options.mongodb.collection);
+				mongoCollection = mongoDB.collection(options.mongodb.collection);
 			}
 		});
 	}

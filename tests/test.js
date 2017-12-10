@@ -6,9 +6,10 @@ require('dotenv').config();
 // (packages) Package dependencies
 var fs = require('fs');
 var moment = require('moment');
-var MongoClient = require('mongodb').MongoClient;
 var twitter2mongodb = require('../index.js');
 var test = require('tape');
+
+const Client = require('mongodb').MongoClient;
 
 // (test_info) Get package metadata
 var json = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -19,10 +20,6 @@ for (var k in json.dependencies) {
 var devPackages = [];
 for (var k in json.devDependencies) {
 	devPackages.push(k + ' (' + json.devDependencies[k] + ')');
-}
-var optionalPackages = [];
-for (var k in json.optionalDependencies) {
-	optionalPackages.push(k + ' (' + json.optionalDependencies[k] + ')');
 }
 
 // (test_log) Pipe tests to file and output
@@ -40,18 +37,55 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 	t.comment('Date: ' + moment().format('YYYY-MM-DD hh:mm:ss'));
 	t.comment('Dependencies: ' + testedPackages.join(', '));
 	t.comment('Developer: ' + devPackages.join(', '));
-	t.comment('Optional:' + optionalPackages.join(','));
 	
 	// (test_connect) Connect to test database
-	MongoClient.connect(process.env.MONGODB_CONNECTION, function(err, db) {
-		if (err) {
-			t.fail('(MAIN) MongoDB test connect: ' + err.message);
-			collection = db.collection(process.env.MONGODB_COLLECTION);
-		}
-		t.pass('(MAIN) MongoDB test connect');
-	});
-	
-	//
-	
+	Client.connect(process.env.MONGODB_CONNECTION)
+		.then(client => {
+			t.pass('(MAIN) MongoDB connect');
+			t.comment('(A) tests on Twitter REST API');
+			
+			// (test_get_insertone) Insert searched tweets as one object
+			return twitter2mongodb({
+				twitter: {
+					method: 'get',
+					path: 'search/tweets',
+					params: {q: 'twitter'}
+				},
+				mongodb: {method: 'insertOne'}
+			})
+				.then(data => {
+					return data.mongodb.collection.find({}).toArray()
+						.then(docs => {
+							var actual = [data.twitter.tweets];
+							var expected = docs;
+							t.deepEquals(actual, expected, '(A) GET search/tweets to insertOne');
+						});
+				})
+				.catch(err => {
+					t.fail('(A) GET search/tweets to insertOne: ' + err.message);
+				});
+		})
+		.catch(err => {
+			t.fail('(MAIN) MongoDB connect: ' + err.message);
+		})
+		.then(() => {
+			
+			// (test_drop) Drop database
+			Client.connect(process.env.MONGODB_CONNECTION, function(err, client) {
+				if (err) {
+					t.fail('(MAIN) MongoDB drop database: ' + err.message);
+					process.exit(1);
+				}
+				var db = client.db(process.env.MONGODB_DATABASE);
+				db.dropDatabase((err, res) => {
+					if (err) {
+						t.fail('(MAIN) MongoDB drop database: ' + err.message);
+						process.exit(1);
+					}
+					t.pass('(MAIN) MongoDB drop database');
+					process.exit(0);
+				});
+			});
+		});
 	t.end();
 });
