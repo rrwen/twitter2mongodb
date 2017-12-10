@@ -256,7 +256,7 @@
   
     (default <code>{}</code>)
   </td>
-  <td class='break-word'><span>contains options for queries in 
+  <td class='break-word'><span>contains options for methods in 
 <a href="https://www.npmjs.com/package/mongodb">mongodb</a>
 .
 </span></td>
@@ -266,7 +266,7 @@
     <tr>
   <td class='break-word'><span class='code bold'>options.mongodb.connection</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
   
-    (default <code>process.env.MONGODB_CONNECTION||&#39;mongodb://localhost:27017&#39;</code>)
+    (default <code>process.env.MONGODB_CONNECTION||&#39;mongodb://localhost:27017/test&#39;</code>)
   </td>
   <td class='break-word'><span>MongoDB 
 <a href="https://docs.mongodb.com/manual/reference/connection-string/">connection string</a>
@@ -284,6 +284,47 @@
   <td class='break-word'><span>Mongodb 
 <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection">collection</a>
  name.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>options.mongodb.options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+  
+    (default <code>process.env.MONGODB_OPTIONS</code>)
+  </td>
+  <td class='break-word'><span>Mongodb client 
+<a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#.connect">connect options</a>
+.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>options.mongodb.method</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
+  
+    (default <code>process.env.MONGODB_METHOD||&#39;insertOne&#39;</code>)
+  </td>
+  <td class='break-word'><span>Mongodb 
+<a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection">collection</a>
+ method.
+</span></td>
+</tr>
+
+
+  
+    <tr>
+  <td class='break-word'><span class='code bold'>options.mongodb.method_options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a> | <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+  
+    (default <code>process.env.MONGODB_METHOD_OPTIONS</code>)
+  </td>
+  <td class='break-word'><span>Mongodb 
+<a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection">collection</a>
+ method options relative to 
+<code>options.mongodb.method</code>
+.
 </span></td>
 </tr>
 
@@ -329,8 +370,10 @@
 <li><code>data</code> is in the form of <code>{twitter: {stream: stream, tweets: Object}, mongodb: {client: Object, results: Object}}</code></li>
 <li><code>data.twitter.stream</code> is the <a href="https://www.npmjs.com/package/twitter#streaming-api">twitter stream</a></li>
 <li><code>data.twitter.tweets</code> are  the <a href="https://www.npmjs.com/package/twitter">tweets</a> in JSON format</li>
-<li><code>data.mongodb.client</code> is the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient">client</a> from <code>options.mongodb.connection</code></li>
-<li><code>data.mongodb.results</code> is the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult">query results</a> of <code>options.mongodb.query</code></li>
+<li><code>data.mongodb.client</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient">client</a>  </li>
+<li><code>data.mongodb.collection</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection">collection</a> object from <code>options.mongodb.collection</code>  </li>
+<li><code>data.mongodb.db</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Db">db instance</a> from <code>options.mongodb.connection</code>  </li>
+<li><code>data.mongodb.results</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult">method results</a> of <code>options.mongodb.method</code></li>
 </ul>
 </span></td>
 </tr>
@@ -365,11 +408,27 @@
 </ul>
 <p><strong>Else</strong> </p>
 <ul>
-<li>Return a <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> object that resolves a <code>data</code> object in the form <code>{twitter: {client: ..., tweets: ...}, mongodb: {client: ..., results: ...}}</code>  </li>
-<li><code>data.twitter.client</code>: contains a <a href="https://www.npmjs.com/package/twitter">Twitter client</a> object created from <code>options.twitter.connection</code>  </li>
-<li><code>data.twitter.tweets</code>: contains the <a href="https://www.npmjs.com/package/twitter">tweets</a> in JSON format  </li>
-<li><code>data.mongodb.client</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient">client</a> from <code>options.mongodb.connection</code>  </li>
-<li><code>data.mongodb.results</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult">query results</a> of <code>options.mongodb.query</code></li>
+<li>
+<p>Return a <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a> object that resolves a <code>data</code> object in the form <code>{twitter: {client: ..., tweets: ...}, mongodb: {client: ..., results: ...}}</code>  </p>
+</li>
+<li>
+<p><code>data.twitter.client</code>: contains a <a href="https://www.npmjs.com/package/twitter">Twitter client</a> object created from <code>options.twitter.connection</code>  </p>
+</li>
+<li>
+<p><code>data.twitter.tweets</code>: contains the <a href="https://www.npmjs.com/package/twitter">tweets</a> in JSON format  </p>
+</li>
+<li>
+<p><code>data.mongodb.client</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient">client</a>  </p>
+</li>
+<li>
+<p><code>data.mongodb.collection</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection">collection</a> object from <code>options.mongodb.collection</code>   </p>
+</li>
+<li>
+<p><code>data.mongodb.db</code>: contains the MongoDB (@link <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Db">https://mongodb.github.io/node-mongodb-native/3.0/api/Db</a> db instance} from <code>options.mongodb.connection</code>  </p>
+</li>
+<li>
+<p><code>data.mongodb.results</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult">method results</a> of <code>options.mongodb.method</code></p>
+</li>
 </ul>
 
       
@@ -382,7 +441,71 @@
     <div class='py1 quiet mt1 prose-big'>Example</div>
     
       
-      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">var</span> twitter2mongodb = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../index.js'</span>);</pre>
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">var</span> twitter2mongodb = <span class="hljs-built_in">require</span>(<span class="hljs-string">'twitter2mongodb'</span>);
+
+<span class="hljs-comment">// (options) Initialize options object</span>
+<span class="hljs-keyword">var</span> options = {
+	<span class="hljs-attr">twitter</span>: {},
+	<span class="hljs-attr">pg</span>: {}
+};
+
+<span class="hljs-comment">// *** CONNECTION SETUP ***</span>
+
+<span class="hljs-comment">// (options_twitter_connection) Twitter API connection keys</span>
+options.twitter.connection =  {
+	<span class="hljs-attr">consumer_key</span>: <span class="hljs-string">'***'</span>,
+	<span class="hljs-attr">consumer_secret</span>: <span class="hljs-string">'***'</span>,
+	<span class="hljs-attr">access_token_key</span>: <span class="hljs-string">'***'</span>,
+	<span class="hljs-attr">access_token_secret</span>: <span class="hljs-string">'***'</span>
+};
+
+<span class="hljs-comment">// (options_mongodb_connection) MongoDB connection details</span>
+<span class="hljs-comment">// Format: 'mongodb://&lt;user&gt;:&lt;password&gt;@&lt;host&gt;:&lt;port&gt;/&lt;database&gt;'</span>
+options.mongodb.connection = <span class="hljs-string">'mongodb://localhost:27017/test'</span>;
+
+<span class="hljs-comment">// *** SEARCH TWEETS ***</span>
+
+<span class="hljs-comment">// (options_twitter_rest) Search for keyword 'twitter' in path 'GET search/tweets'</span>
+options.twitter = {
+	<span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>, <span class="hljs-comment">// get, post, or stream</span>
+	path: <span class="hljs-string">'search/tweets'</span>, <span class="hljs-comment">// api path</span>
+	params: {<span class="hljs-attr">q</span>: <span class="hljs-string">'twitter'</span>} <span class="hljs-comment">// query tweets</span>
+};
+
+<span class="hljs-comment">// (options_jsonata) Filter for statuses array using jsonata</span>
+options.jsonata = <span class="hljs-string">'statuses'</span>;
+
+<span class="hljs-comment">// (options_mongodb) MongoDB options</span>
+options.mongodb.method = <span class="hljs-string">'insertMany'</span>; <span class="hljs-comment">// insert many objects due to array</span>
+
+<span class="hljs-comment">// (twitter2mongodb_rest) Query tweets using REST API into MongoDB collection</span>
+twitter2mongodb(options)
+	.then(<span class="hljs-function"><span class="hljs-params">data</span> =&gt;</span> {
+		<span class="hljs-built_in">console</span>.log(data);
+	}).catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
+		<span class="hljs-built_in">console</span>.error(err.message);
+	});
+
+<span class="hljs-comment">// *** STREAM TWEETS ***</span>
+
+<span class="hljs-comment">// (options_twitter_connection) Track keyword 'twitter' in path 'POST statuses/filter'</span>
+options.twitter = {
+	<span class="hljs-attr">method</span>: <span class="hljs-string">'stream'</span>,
+	<span class="hljs-attr">path</span>: <span class="hljs-string">'statuses/filter'</span>,
+	<span class="hljs-attr">params</span>: {<span class="hljs-attr">track</span>: <span class="hljs-string">'twitter'</span>}
+};
+
+<span class="hljs-comment">// (options_mongodb) MongoDB options</span>
+options.mongodb.method = <span class="hljs-string">'insertOne'</span>;
+
+<span class="hljs-comment">// (options_jsonata) Remove jsonata filter</span>
+<span class="hljs-keyword">delete</span> options.jsonata;
+
+<span class="hljs-comment">// (twitter2mongodb_stream) Stream tweets into MongoDB collection</span>
+<span class="hljs-keyword">var</span> stream = twitter2mongodb(options);
+stream.on(<span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+	<span class="hljs-built_in">console</span>.error(error.message);
+});</pre>
     
   
 
