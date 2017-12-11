@@ -200,12 +200,17 @@ module.exports = options => {
 				streamCallback(err, data);
 			});
 		};
+		
+		// (twitter_stream_return) Return twitter stream
+		var stream = twitter2return(options);
 		return stream;
 	} else {
 		
 		// (twitter_rest) REST API
 		return twitter2return(options)
 			.then(data => {
+				
+				// (twitter_promise_return) Return mongodb promise
 				return mongoCollection[options.mongodb.method](data.twitter.tweets, options.mongodb.method_options)
 					.then(res => {
 						data.mongodb = {client: mongoClient, collection: mongoCollection, db: mongoDB, results: res};

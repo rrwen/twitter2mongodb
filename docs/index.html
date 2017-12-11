@@ -157,6 +157,29 @@
 
   
     <tr>
+  <td class='break-word'><span class='code bold'>options.twitter.stream</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a></code>
+  
+    (default <code>function(err,data){}</code>)
+  </td>
+  <td class='break-word'><span>callback function on a stream 'data' event  for the returned 
+<a href="https://www.npmjs.com/package/twitter#streaming-api">Twitter stream</a>
+.
+<ul>
+<li><code>err</code> is the <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a> object</li>
+<li><code>data</code> is in the form of <code>{twitter: {stream: stream, tweets: Object}, mongodb: {client: Object, results: Object}}</code></li>
+<li><code>data.twitter.stream</code> is the <a href="https://www.npmjs.com/package/twitter#streaming-api">twitter stream</a></li>
+<li><code>data.twitter.tweets</code> are  the <a href="https://www.npmjs.com/package/twitter">tweets</a> in JSON format</li>
+<li><code>data.mongodb.client</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient">client</a>  </li>
+<li><code>data.mongodb.collection</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection">collection</a> object from <code>options.mongodb.collection</code>  </li>
+<li><code>data.mongodb.db</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Db">db instance</a> from <code>options.mongodb.connection</code>  </li>
+<li><code>data.mongodb.results</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult">method results</a> of <code>options.mongodb.method</code></li>
+</ul>
+</span></td>
+</tr>
+
+
+  
+    <tr>
   <td class='break-word'><span class='code bold'>options.twitter.connection</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
   
     (default <code>{}</code>)
@@ -357,42 +380,6 @@
 ).
 </span></td>
 </tr>
-
-
-              
-                <tr>
-  <td class='break-word'><span class='code bold'>options.stream</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
-  
-    (default <code>{}</code>)
-  </td>
-  <td class='break-word'><span>options for the returned 
-<a href="https://www.npmjs.com/package/twitter#streaming-api">Twitter stream</a>
-.
-</span></td>
-</tr>
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.stream.callback</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">function</a></code>
-  
-    (default <code>function(err,data){}</code>)
-  </td>
-  <td class='break-word'><span>callback function on a stream 'data' event.
-<ul>
-<li><code>err</code> is the <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a> object</li>
-<li><code>data</code> is in the form of <code>{twitter: {stream: stream, tweets: Object}, mongodb: {client: Object, results: Object}}</code></li>
-<li><code>data.twitter.stream</code> is the <a href="https://www.npmjs.com/package/twitter#streaming-api">twitter stream</a></li>
-<li><code>data.twitter.tweets</code> are  the <a href="https://www.npmjs.com/package/twitter">tweets</a> in JSON format</li>
-<li><code>data.mongodb.client</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient">client</a>  </li>
-<li><code>data.mongodb.collection</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection">collection</a> object from <code>options.mongodb.collection</code>  </li>
-<li><code>data.mongodb.db</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Db">db instance</a> from <code>options.mongodb.connection</code>  </li>
-<li><code>data.mongodb.results</code>: contains the MongoDB <a href="https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult">method results</a> of <code>options.mongodb.method</code></li>
-</ul>
-</span></td>
-</tr>
-
-
-  
 
 
               
