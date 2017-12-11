@@ -199,7 +199,7 @@ module.exports = options => {
 				data.mongodb = {client: mongoClient, collection: mongoCollection, db: mongoDB, results: res};
 				streamCallback(err, data);
 			});
-		}
+		};
 		return stream;
 	} else {
 		
