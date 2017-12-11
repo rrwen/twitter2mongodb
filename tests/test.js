@@ -51,7 +51,10 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 					path: 'search/tweets',
 					params: {q: 'twitter'}
 				},
-				mongodb: {method: 'insertOne'}
+				mongodb: {
+					method: 'insertOne',
+					collection: 'test_insertOne'
+				}
 			})
 				.then(data => {
 					return data.mongodb.collection.find({}).toArray()
@@ -63,6 +66,33 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 				})
 				.catch(err => {
 					t.fail('(A) GET search/tweets to insertOne: ' + err.message);
+				});
+		})
+		.then(() => {
+			
+			// (test_get_insertMany) Insert searched tweets as array filtering for statuses
+			return twitter2mongodb({
+				twitter: {
+					method: 'get',
+					path: 'search/tweets',
+					params: {q: 'twitter'}
+				},
+				mongodb: {
+					method: 'insertMany',
+					collection: 'test_insertMany'
+				},
+				jsonata: 'statuses'
+			})
+				.then(data => {
+					return data.mongodb.collection.find({}).toArray()
+						.then(docs => {
+							var actual = data.twitter.tweets;
+							var expected = docs;
+							t.deepEquals(actual, expected, '(A) GET search/tweets to insertMany');
+						});
+				})
+				.catch(err => {
+					t.fail('(A) GET search/tweets to insertMany: ' + err.message);
 				});
 		})
 		.catch(err => {

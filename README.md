@@ -159,11 +159,9 @@ npm publish
 A description of the overall implementation of twitter2mongodb.
 
 ```
-component   <-- detail
+twitter   <-- detail
     |
-component   <-- detail
+jsonata   <-- detail
     |
-component   <-- detail
-    |
-component   <-- detail
+mongodb   <-- detail
 ```

@@ -1,8 +1,7 @@
 // Richard Wen
 // rrwen.dev@gmail.com
 
-var jsonata = require("jsonata");
-var Twitter = require('twitter');
+var twitter2return = require('twitter2return');
 
 const Client = require('mongodb').MongoClient;
 
@@ -26,6 +25,17 @@ const Client = require('mongodb').MongoClient;
  *
  * * For REST API endpoints, see {@link https://developer.twitter.com/en/docs/api-reference-index Twitter API Reference Index}
  * * For Streaming endpoints, see {@link https://developer.twitter.com/en/docs/tweets/filter-realtime/overview Filter Realtime Tweets}
+ *
+ * @param {function} [options.twitter.stream=function(err, data){}] callback function on a stream 'data' event  for the returned {@link  https://www.npmjs.com/package/twitter#streaming-api Twitter stream}.
+ *
+ * * `err` is the {@link Error} object
+ * * `data` is in the form of `{twitter: {stream: stream, tweets: Object}, mongodb: {client: Object, results: Object}}`
+ * * `data.twitter.stream` is the {@link https://www.npmjs.com/package/twitter#streaming-api twitter stream}
+ * * `data.twitter.tweets` are  the {@link https://www.npmjs.com/package/twitter tweets} in JSON format
+ * * `data.mongodb.client`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient client}  
+ * * `data.mongodb.collection`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} object from `options.mongodb.collection`  
+ * * `data.mongodb.db`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Db db instance} from `options.mongodb.connection`  
+ * * `data.mongodb.results`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult method results} of `options.mongodb.method`  
  *
  * @param {Object} [options.twitter.connection={}] Twitter API connection credentials:  
  *
@@ -54,17 +64,6 @@ const Client = require('mongodb').MongoClient;
   * @param {string} [options.mongodb.method=process.env.MONGODB_METHOD||'insertOne'] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} method.
   * @param {string|Object} [options.mongodb.method_options=process.env.MONGODB_METHOD_OPTIONS] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} method options relative to `options.mongodb.method`.
  * @param {string} [options.jsonata=process.env.JSONATA] {@link https://www.npmjs.com/package/jsonata jsonata} query for the received tweet object in JSON format before inserting into the MongoDB collection (`options.mongodb.collection`).
- * @param {Object} [options.stream={}] options for the returned {@link  https://www.npmjs.com/package/twitter#streaming-api Twitter stream}.
- * @param {function} [options.stream.callback=function(err, data){}] callback function on a stream 'data' event.
- *
- * * `err` is the {@link Error} object
- * * `data` is in the form of `{twitter: {stream: stream, tweets: Object}, mongodb: {client: Object, results: Object}}`
- * * `data.twitter.stream` is the {@link https://www.npmjs.com/package/twitter#streaming-api twitter stream}
- * * `data.twitter.tweets` are  the {@link https://www.npmjs.com/package/twitter tweets} in JSON format
- * * `data.mongodb.client`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient client}  
- * * `data.mongodb.collection`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} object from `options.mongodb.collection`  
- * * `data.mongodb.db`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Db db instance} from `options.mongodb.connection`  
- * * `data.mongodb.results`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult method results} of `options.mongodb.method`  
  *
  * @returns {(Promise|stream)} Returns a stream if `options.twitter.method` is 'stream', otherwise returns a Promise:
  *
@@ -151,29 +150,6 @@ const Client = require('mongodb').MongoClient;
  */
 module.exports = options => {
 	options = options || {};
-	options.jsonata = options.jsonata || process.env.JSONATA;
-	
-	// (stream_defaults) Default options for streams
-	options.stream = options.stream || {};
-	options.stream.callback = options.stream.callback || function(err, data){};
-	
-	// (twitter_defaults) Default options for twitter
-	options.twitter = options.twitter || {};
-	options.twitter.method = options.twitter.method || process.env.TWITTER_METHOD || 'get';
-	options.twitter.path = options.twitter.path || process.env.TWITTER_PATH || 'search/tweets';
-	options.twitter.params = options.twitter.params || process.env.TWITTER_PARAMS || {q:'twitter'};
-	if (typeof options.twitter.params == 'string') {
-		options.twitter.params = JSON.parse(options.twitter.params);
-	}
-	
-	// (twitter_connect) Connection options for twitter
-	options.twitter.connection = options.twitter.connection || {};
-	options.twitter.connection.consumer_key = options.twitter.connection.consumer_key || process.env.TWITTER_CONSUMER_KEY;
-	options.twitter.connection.consumer_secret = options.twitter.connection.consumer_secret || process.env.TWITTER_CONSUMER_SECRET;
-	options.twitter.connection.access_token_key = options.twitter.connection.access_token_key || process.env.TWITTER_ACCESS_TOKEN_KEY;
-	options.twitter.connection.access_token_secret = options.twitter.connection.access_token_secret || process.env.TWITTER_ACCESS_TOKEN_SECRET;
-	options.twitter.connection.bearer_token = options.twitter.connection.bearer_token || process.env.TWITTER_BEARER_TOKEN;
-	var client = new Twitter(options.twitter.connection);
 	
 	// (mongodb_defaults) Default options for mongodb
 	options.mongodb = options.mongodb || {};
@@ -212,37 +188,28 @@ module.exports = options => {
 	}
 	
 	// (twitter_stream) Streaming API
+	options.twitter = options.twitter || {};
+	options.twitter.method = options.twitter.method || 'get';
 	if (options.twitter.method == 'stream') {
-		var stream = client[options.twitter.method](options.twitter.path, options.twitter.params);
-		stream.on('data', function(tweets) {
-			
-			// (twitter_stream_jsonata) Filter tweets using jsonata syntax
-			if (options.jsonata) {
-				tweets = jsonata(options.jsonata).evaluate(tweets);
-			}
-			
-			// (twitter_stream_mongodb) Insert tweets into collection as docs
-			mongoCollection[options.mongodb.method](tweets, options.mongodb.method_options, function(err, res) {
-				var data = {twitter: {stream: stream, tweets: tweets}, mongodb: {client: mongoClient, collection: mongoCollection, db: mongoDB, results: res}};
-				options.stream.callback(err, data);
+		
+		// (twitter_stream_mongodb) Insert tweets into collection as docs
+		var streamCallback = options.twitter.stream || function(err, data) {};
+		options.twitter.stream = function(err, data) {
+			mongoCollection[options.mongodb.method](data.twitter.tweets, options.mongodb.method_options, function(err, res) {
+				data.mongodb = {client: mongoClient, collection: mongoCollection, db: mongoDB, results: res};
+				streamCallback(err, data);
 			});
-		});
+		}
 		return stream;
 	} else {
 		
 		// (twitter_rest) REST API
-		return client[options.twitter.method](options.twitter.path, options.twitter.params)
-			.then(tweets => {
-				
-				// (twitter_rest_jsonata) Filter tweets using jsonata syntax
-				if (options.jsonata) {
-					tweets = jsonata(options.jsonata).evaluate(tweets);
-				}
-				
-				// (twitter_rest_mongodb) Insert tweets into mongodb
-				return mongoCollection[options.mongodb.method](tweets, options.mongodb.method_options)
+		return twitter2return(options)
+			.then(data => {
+				return mongoCollection[options.mongodb.method](data.twitter.tweets, options.mongodb.method_options)
 					.then(res => {
-						return {twitter: {stream: stream, tweets: tweets}, mongodb: {client: mongoClient, collection: mongoCollection, db: mongoDB, results: res}};
+						data.mongodb = {client: mongoClient, collection: mongoCollection, db: mongoDB, results: res};
+						return data;
 					});
 			});
 	}
