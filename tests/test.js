@@ -37,40 +37,41 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 	t.comment('Date: ' + moment().format('YYYY-MM-DD hh:mm:ss'));
 	t.comment('Dependencies: ' + testedPackages.join(', '));
 	t.comment('Developer: ' + devPackages.join(', '));
+	process.env.MONGODB_DATABASE = process.env.MONGODB_TESTDATABASE;
 	
 	// (test_connect) Connect to test database
 	Client.connect(process.env.MONGODB_CONNECTION)
 		.then(client => {
+			
+			// (test_connect_pass) Connection successful
 			t.pass('(MAIN) MongoDB connect');
 			t.comment('(A) tests on Twitter REST API');
 			
-			// (test_get_insertone) Insert searched tweets as one object
+			// (test_rest_insertone) Insert searched tweets as one object
 			return twitter2mongodb({
-				twitter: {
-					method: 'get',
-					path: 'search/tweets',
-					params: {q: 'twitter'}
-				},
 				mongodb: {
-					method: 'insertOne',
-					collection: 'test_insertOne'
+					options: {poolsize: 5}
 				}
 			})
 				.then(data => {
+					
+					// (test_rest_insertone_pass) Pass if consistent with database
 					return data.mongodb.collection.find({}).toArray()
 						.then(docs => {
 							var actual = [data.twitter.tweets];
 							var expected = docs;
-							t.deepEquals(actual, expected, '(A) GET search/tweets to insertOne');
+							t.deepEquals(actual, expected, '(A) REST GET search/tweets to insertOne');
 						});
 				})
 				.catch(err => {
-					t.fail('(A) GET search/tweets to insertOne: ' + err.message);
+					
+					// (test_rest_insertone_fail) Fail if inconsistent with database or error
+					t.fail('(A) REST GET search/tweets to insertOne: ' + err.message);
 				});
 		})
 		.then(() => {
 			
-			// (test_get_insertMany) Insert searched tweets as array filtering for statuses
+			// (test_rest_insertmany) Insert searched tweets as array filtering for statuses
 			return twitter2mongodb({
 				twitter: {
 					method: 'get',
@@ -79,43 +80,113 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 				},
 				mongodb: {
 					method: 'insertMany',
-					collection: 'test_insertMany'
+					collection: 'test_insertMany',
+					options: '{"poolsize": 5}'
 				},
 				jsonata: 'statuses'
 			})
 				.then(data => {
+					
+					// (test_rest_insertmany_pass) Pass if consistent with database
 					return data.mongodb.collection.find({}).toArray()
 						.then(docs => {
 							var actual = data.twitter.tweets;
 							var expected = docs;
-							t.deepEquals(actual, expected, '(A) GET search/tweets to insertMany');
+							t.deepEquals(actual, expected, '(A) REST GET search/tweets to insertMany');
+							return data;
 						});
 				})
 				.catch(err => {
-					t.fail('(A) GET search/tweets to insertMany: ' + err.message);
+					
+					// (test_rest_insertmany_fail) Fail if inconsistent with database or error
+					t.fail('(A) REST GET search/tweets to insertMany: ' + err.message);
 				});
 		})
-		.catch(err => {
-			t.fail('(MAIN) MongoDB connect: ' + err.message);
-		})
-		.then(() => {
+		.then(data => {
+			t.comment('(B) tests on Twitter Stream API')
 			
-			// (test_drop) Drop database
-			Client.connect(process.env.MONGODB_CONNECTION, function(err, client) {
-				if (err) {
-					t.fail('(MAIN) MongoDB drop database: ' + err.message);
-					process.exit(1);
+			// (test_stream) Insert streamed tweet
+			var stream = twitter2mongodb({
+				twitter: {
+					method: 'stream',
+					path: 'statuses/filter',
+					params: '{"track": "twitter"}'
+				},
+				mongodb: {
+					method: 'insertOne',
+					collection: 'test_stream'
 				}
-				var db = client.db(process.env.MONGODB_DATABASE);
-				db.dropDatabase((err, res) => {
+			});
+			
+			// (test_stream_pass) Pass if stream data arrives
+			stream.on('data', tweets => {
+				var collection = data.mongodb.db.collection('test_stream');
+				collection.find({}).toArray()
+					.then(docs => {
+						t.pass('(B) STREAM POST statuses/filter to insertOne');
+						
+						// (test_drop) Drop database
+						Client.connect(process.env.MONGODB_CONNECTION, function(err, client) {
+							
+							// (test_drop_fail) Unable to drop database due to connection
+							if (err) {
+								t.fail('(MAIN) MongoDB drop database: ' + err.message);
+								process.exit(1);
+							}
+							
+							// (test_drop_client) Drop database with client
+							var db = client.db(process.env.MONGODB_DATABASE);
+							db.dropDatabase((err, res) => {
+								
+								// (test_drop_fail2) Unable to drop database
+								if (err) {
+									t.fail('(MAIN) MongoDB drop database: ' + err.message);
+									process.exit(1);
+								}
+								
+								// (test_drop_pass) Dropped database
+								t.pass('(MAIN) MongoDB drop database');
+								process.exit(0);
+							});
+						});
+					});
+			});
+			
+			// (test_stream_fail) Fail if error
+			stream.on('error', error => {
+				t.fail('(B) STREAM POST statuses/filter to insertOne: ' + error.message);
+				stream.destroy();
+				
+				// (test_drop) Drop database
+				Client.connect(process.env.MONGODB_CONNECTION, function(err, client) {
+					
+					// (test_drop_fail) Unable to drop database due to connection
 					if (err) {
 						t.fail('(MAIN) MongoDB drop database: ' + err.message);
 						process.exit(1);
 					}
-					t.pass('(MAIN) MongoDB drop database');
-					process.exit(0);
+					
+					// (test_drop_client) Drop database with client
+					var db = client.db(process.env.MONGODB_DATABASE);
+					db.dropDatabase((err, res) => {
+						
+						// (test_drop_fail2) Unable to drop database
+						if (err) {
+							t.fail('(MAIN) MongoDB drop database: ' + err.message);
+							process.exit(1);
+						}
+						
+						// (test_drop_pass) Dropped database
+						t.pass('(MAIN) MongoDB drop database');
+						process.exit(0);
+					});
 				});
 			});
+		})
+		.catch(err => {
+			
+			// (test_connect_fail) Unable to connect
+			t.fail('(MAIN) MongoDB connect: ' + err.message);
 		});
 	t.end();
 });

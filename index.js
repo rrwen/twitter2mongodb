@@ -14,17 +14,7 @@ const Client = require('mongodb').MongoClient;
  * @module twitter2mongodb
  *
  * @param {Object} [options={}] options for this function.
- * @param {Object} [options.twitter={}] options for {@link https://www.npmjs.com/package/twitter twitter}.
- * @param {Object} [options.twitter.method=process.env.TWITTER_METHOD || 'get'] Twitter API request method in lowercase letters ('get', 'post', 'delete', or 'stream').
- * @param {Object} [options.twitter.path=process.env.TWITTER_PATH || 'search/tweets'] Twitter API endpoint path (such as 'search/tweets' for 'get' or 'statuses/filter' for 'stream').
- *
- * * For REST API endpoints, see {@link https://developer.twitter.com/en/docs/api-reference-index Twitter API Reference Index}
- * * For Streaming endpoints, see {@link https://developer.twitter.com/en/docs/tweets/filter-realtime/overview Filter Realtime Tweets}
- *
- * @param {Object} [options.twitter.params=process.env.TWITTER_PARAMS || {q:'twitter'}] Twitter API parameters for the `options.twitter.method` and `options.twitter.path`.
- *
- * * For REST API endpoints, see {@link https://developer.twitter.com/en/docs/api-reference-index Twitter API Reference Index}
- * * For Streaming endpoints, see {@link https://developer.twitter.com/en/docs/tweets/filter-realtime/overview Filter Realtime Tweets}
+ * @param {Object} [options.twitter={}] options for {@link https://www.npmjs.com/package/twitter twitter} (see {@link https://rrwen.github.io/twitter2return/ twitter2return}).
  *
  * @param {function} [options.twitter.stream=function(err, data){}] callback function on a stream 'data' event  for the returned {@link  https://www.npmjs.com/package/twitter#streaming-api Twitter stream}.
  *
@@ -37,25 +27,6 @@ const Client = require('mongodb').MongoClient;
  * * `data.mongodb.db`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Db db instance} from `options.mongodb.connection`  
  * * `data.mongodb.results`: contains the MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection#~insertWriteOpResult method results} of `options.mongodb.method`  
  *
- * @param {Object} [options.twitter.connection={}] Twitter API connection credentials:  
- *
- * 1. Login at {@link https://apps.twitter.com/}
- * 2. Create a {@link https://apps.twitter.com/app/new new application}
- * 3. Go to your {@link https://apps.twitter.com/ applications}
- * 4. Click on your created application
- * 5. Click on **Keys and Access Tokens**
- * 6. Keep note of the following:
- *
- * * **Consumer Key (API Key)**
- * * **Consumer Secret (API Secret)**
- * * **Access Token**
- * * **Access Token Secret**
- *
- * @param {string} [options.twitter.connection.consumer_key=process.env.TWITTER_CONSUMER_KEY] Twitter API **Consumer Key (API Key)**.
- * @param {string} [options.twitter.connection.consumer_secret=process.env.TWITTER_CONSUMER_SECRET] Twitter API **Consumer Secret (API Secret)**.
- * @param {string} [options.twitter.connection.access_token_key=process.env.TWITTER_ACCESS_TOKEN_KEY] Twitter API **Access Token Key**.
- * @param {string} [options.twitter.connection.access_token_secret=process.env.TWITTER_ACCESS_TOKEN_SECRET] Twitter API **Access Token Secret**.
- * @param {string} [options.twitter.connection.bearer_token=process.env.TWITTER_BEARER_TOKEN] Twitter API **Bearer Token**.
  * @param {Object} [options.mongodb={}] contains options for methods in {@link https://www.npmjs.com/package/mongodb mongodb}.
  * @param {string} [options.mongodb.connection=process.env.MONGODB_CONNECTION || 'mongodb://localhost:27017'] MongoDB {@link https://docs.mongodb.com/manual/reference/connection-string/ connection string}.
  * @param {string} [options.mongodb.database=process.env.MONGODB_DATABASE || 'test'] MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Db database name}.

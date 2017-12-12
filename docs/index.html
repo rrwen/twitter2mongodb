@@ -106,54 +106,11 @@
   </td>
   <td class='break-word'><span>options for 
 <a href="https://www.npmjs.com/package/twitter">twitter</a>
-.
+ (see 
+<a href="https://rrwen.github.io/twitter2return/">twitter2return</a>
+).
 </span></td>
 </tr>
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.twitter.method</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
-  
-    (default <code>process.env.TWITTER_METHOD||&#39;get&#39;</code>)
-  </td>
-  <td class='break-word'><span>Twitter API request method in lowercase letters ('get', 'post', 'delete', or 'stream').
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.twitter.path</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
-  
-    (default <code>process.env.TWITTER_PATH||&#39;search/tweets&#39;</code>)
-  </td>
-  <td class='break-word'><span>Twitter API endpoint path (such as 'search/tweets' for 'get' or 'statuses/filter' for 'stream').
-<ul>
-<li>For REST API endpoints, see <a href="https://developer.twitter.com/en/docs/api-reference-index">Twitter API Reference Index</a></li>
-<li>For Streaming endpoints, see <a href="https://developer.twitter.com/en/docs/tweets/filter-realtime/overview">Filter Realtime Tweets</a></li>
-</ul>
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.twitter.params</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
-  
-    (default <code>process.env.TWITTER_PARAMS||{q:&#39;twitter&#39;}</code>)
-  </td>
-  <td class='break-word'><span>Twitter API parameters for the 
-<code>options.twitter.method</code>
- and 
-<code>options.twitter.path</code>
-.
-<ul>
-<li>For REST API endpoints, see <a href="https://developer.twitter.com/en/docs/api-reference-index">Twitter API Reference Index</a></li>
-<li>For Streaming endpoints, see <a href="https://developer.twitter.com/en/docs/tweets/filter-realtime/overview">Filter Realtime Tweets</a></li>
-</ul>
-</span></td>
-</tr>
-
 
   
     <tr>
@@ -176,98 +133,6 @@
 </ul>
 </span></td>
 </tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.twitter.connection</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>
-  
-    (default <code>{}</code>)
-  </td>
-  <td class='break-word'><span>Twitter API connection credentials:  
-<ol>
-<li>Login at <a href="https://apps.twitter.com/">https://apps.twitter.com/</a></li>
-<li>Create a <a href="https://apps.twitter.com/app/new">new application</a></li>
-<li>Go to your <a href="https://apps.twitter.com/">applications</a></li>
-<li>Click on your created application</li>
-<li>Click on <strong>Keys and Access Tokens</strong></li>
-<li>Keep note of the following:</li>
-</ol>
-<ul>
-<li><strong>Consumer Key (API Key)</strong></li>
-<li><strong>Consumer Secret (API Secret)</strong></li>
-<li><strong>Access Token</strong></li>
-<li><strong>Access Token Secret</strong></li>
-</ul>
-</span></td>
-</tr>
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.twitter.connection.consumer_key</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>process.env.TWITTER_CONSUMER_KEY</code>)
-  </td>
-  <td class='break-word'><span>Twitter API 
-<strong>Consumer Key (API Key)</strong>
-.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.twitter.connection.consumer_secret</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>process.env.TWITTER_CONSUMER_SECRET</code>)
-  </td>
-  <td class='break-word'><span>Twitter API 
-<strong>Consumer Secret (API Secret)</strong>
-.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.twitter.connection.access_token_key</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>process.env.TWITTER_ACCESS_TOKEN_KEY</code>)
-  </td>
-  <td class='break-word'><span>Twitter API 
-<strong>Access Token Key</strong>
-.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.twitter.connection.access_token_secret</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>process.env.TWITTER_ACCESS_TOKEN_SECRET</code>)
-  </td>
-  <td class='break-word'><span>Twitter API 
-<strong>Access Token Secret</strong>
-.
-</span></td>
-</tr>
-
-
-  
-    <tr>
-  <td class='break-word'><span class='code bold'>options.twitter.connection.bearer_token</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>
-  
-    (default <code>process.env.TWITTER_BEARER_TOKEN</code>)
-  </td>
-  <td class='break-word'><span>Twitter API 
-<strong>Bearer Token</strong>
-.
-</span></td>
-</tr>
-
-
-  
 
 
   
