@@ -9,6 +9,7 @@ Module for extracting Twitter data to MongoDB databases
 
 [![npm version](https://badge.fury.io/js/twitter2mongodb.svg)](https://badge.fury.io/js/twitter2mongodb)
 [![Build Status](https://travis-ci.org/rrwen/twitter2mongodb.svg?branch=master)](https://travis-ci.org/rrwen/twitter2mongodb)
+[![Coverage Status](https://coveralls.io/repos/github/rrwen/twitter2mongodb/badge.svg?branch=master)](https://coveralls.io/github/rrwen/twitter2mongodb?branch=master)
 [![npm](https://img.shields.io/npm/dt/twitter2mongodb.svg)](https://www.npmjs.com/package/twitter2mongodb)
 [![GitHub license](https://img.shields.io/github/license/rrwen/twitter2mongodb.svg)](https://github.com/rrwen/twitter2mongodb/blob/master/LICENSE)
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/rrwen/twitter2mongodb.svg?style=social)](https://twitter.com/intent/tweet?text=Module%20for%20extracting%20Twitter%20data%20to%20MongoDB%20databases:%20https%3A%2F%2Fgithub.com%2Frrwen%2Ftwitter2mongodb%20%23nodejs%20%23npm)
@@ -156,12 +157,15 @@ npm publish
 
 ### Implementation
 
-A description of the overall implementation of twitter2mongodb.
+The module [twitter2mongodb](https://www.npmjs.com/package/twitter2mongodb) uses the following [npm](https://www.npmjs.com/) packages for its implementation:
+
+npm | Purpose
+--- | ---
+[twitter2return](https://www.npmjs.com/package/twitter2return) | Connections to the Twitter API REST and Streaming Application Programming Interfaces (APIs) using [twitter](https://www.npmjs.com/package/twitter) with a query language called [jsonata](https://www.npmjs.com/package/jsonata) to filter TWitter JSON data before inserting into MongoDB
+[mongodb](https://www.npmjs.com/package/mongodb) | Insert Twitter data to MongoDB collections
 
 ```
-twitter   <-- detail
+twitter2return   <-- Extract Twitter data from API and Filter JSON data
     |
-jsonata   <-- detail
-    |
-mongodb   <-- detail
+mongodb            <-- Insert filtered Twitter data into MongoDB collection
 ```
