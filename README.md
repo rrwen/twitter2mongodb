@@ -166,6 +166,6 @@ npm | Purpose
 
 ```
 twitter2return   <-- Extract Twitter data from API and Filter JSON data
-    |
-mongodb            <-- Insert filtered Twitter data into MongoDB collection
+      |
+   mongodb       <-- Insert filtered Twitter data into MongoDB collection
 ```
