@@ -35,7 +35,7 @@ It is recommended to use a `.env` file at the root of your project directory wit
 * ` TWITTER_ACCESS_TOKEN_KEY`: Access token
 * `TWITTER_ACCESS_TOKEN_SECRET`: Access token secret
 * `MONGODB_CONNECTION`: MongoDB [connection string](https://docs.mongodb.com/manual/reference/connection-string/)
-*` MONGODB_DATABASE`: MongoDB database name
+* `MONGODB_DATABASE`: MongoDB database name
 * `MONGODB_COLLECTION`: MongoDB collection name
 
 ```
