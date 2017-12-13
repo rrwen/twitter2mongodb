@@ -67,6 +67,8 @@ See [Documentation](https://rrwen.github.io/twitter2mongodb) for more details.
 7. Execute `twitter2mongodb` with the REST API options
 
 ```javascript
+require('dotenv').config();
+
 var twitter2mongodb = require('twitter2mongodb');
 
 // (options) Initialize options object
@@ -120,6 +122,8 @@ twitter2mongodb(options)
 7. Execute `twitter2return` with the Stream API options
 
 ```javascript
+require('dotenv').config();
+
 var twitter2mongodb = require('twitter2mongodb');
 
 // (options) Initialize options object
