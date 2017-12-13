@@ -29,7 +29,7 @@ For the latest developer version, see [Developer Install](#developer-install).
 
 It is recommended to use a `.env` file at the root of your project directory with the following contents:
 
-* Obtain the keys below from https://apps.twitter.com/
+* Twitter keys can be obtained from https://apps.twitter.com/
 * `TWITTER_CONSUMER_KEY`: Consumer key (API Key)
 * `TWITTER_CONSUMER_SECRET`: Consumer secret (API secret)
 * ` TWITTER_ACCESS_TOKEN_KEY`: Access token
@@ -119,7 +119,7 @@ twitter2mongodb(options)
 6. Log the `tweets` when they are received
 7. Execute `twitter2return` with the Stream API options
 
-```
+```javascript
 var twitter2mongodb = require('twitter2mongodb');
 
 // (options) Initialize options object
