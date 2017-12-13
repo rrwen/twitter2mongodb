@@ -27,13 +27,138 @@ For the latest developer version, see [Developer Install](#developer-install).
 
 ## Usage
 
-An example usage of twitter2mongodb:
+It is recommended to use a `.env` file at the root of your project directory with the following contents:
+
+* Obtain the keys below from https://apps.twitter.com/
+* `TWITTER_CONSUMER_KEY`: Consumer key (API Key)
+* `TWITTER_CONSUMER_SECRET`: Consumer secret (API secret)
+* ` TWITTER_ACCESS_TOKEN_KEY`: Access token
+* `TWITTER_ACCESS_TOKEN_SECRET`: Access token secret
+*` MONGODB_CONNECTION`: MongoDB [connection string](https://docs.mongodb.com/manual/reference/connection-string/)
+*` MONGODB_DATABASE`: MongoDB database name
+* `MONGODB_COLLECTION`: MongoDB collection name
 
 ```
-var twitter2mongodb = require('twitter2mongodb');
+TWITTER_CONSUMER_KEY=***
+TWITTER_CONSUMER_SECRET=***
+TWITTER_ACCESS_TOKEN_KEY=***
+TWITTER_ACCESS_TOKEN_SECRET=***
+MONGODB_CONNECTION=mongodb://localhost:27017
+MONGODB_DATABASE=test
+MONGODB_COLLECTION=twitter_data
+```
+
+The `.env` file above can be loaded using [dotenv](https://www.npmjs.com/package/dotenv) (`npm install --save dotenv`):
+
+```javascript
+require('dotenv').config();
 ```
 
 See [Documentation](https://rrwen.github.io/twitter2mongodb) for more details.
+
+### REST API
+
+1. Load `.env` file variables
+2. Load `twitter2mongodb`
+3. Create `options` object
+4. Optionally define Twitter API keys and MongoDB connection
+5. Search keyword `twitter` from `GET search/tweets`
+6. Apply a `jsonata` filter for statuses key only
+7. Execute `twitter2mongodb` with the REST API options
+
+```javascript
+var twitter2mongodb = require('twitter2mongodb');
+
+// (options) Initialize options object
+var options = {
+	twitter: {},
+	mongodb: {}
+};
+
+// (options_twitter_connection) Twitter API connection keys
+options.twitter.connection =  {
+	consumer_key: '***', // process.env.TWITTER_CONSUMER_KEY
+	consumer_secret: '***', // process.env.TWITTER_CONSUMER_SECRET
+	access_token_key: '***', // process.env.TWITTER_ACCESS_TOKEN_SECRET
+	access_token_secret: '***' // process.env.TWITTER_ACCESS_TOKEN_SECRET
+};
+
+// (options_mongodb_connection) MongoDB connection details
+// Format: 'mongodb://<user>:<password>@<host>:<port>/<database>'
+options.mongodb.connection = 'mongodb://localhost:27017'; // process.env.MONGODB_CONNECTION
+options.mongodb.database = 'test'; // process.env.MONGODB_DATABASE
+options.mongodb.collection = 'twitter_data'; // process.env.MONGODB_COLLECTION
+
+// (options_twitter_rest) Search for keyword 'twitter' in path 'GET search/tweets'
+options.twitter.method = 'get'; // get, post, or stream
+options.twitter.path = 'search/tweets'; // api path
+options.twitter.params = {q: 'twitter'}; // query tweets
+
+// (options_jsonata) Filter for statuses array using jsonata
+options.jsonata = 'statuses';
+
+// (options_mongodb) MongoDB options
+options.mongodb.method = 'insertMany'; // insert many objects due to array
+
+// (twitter2mongodb_rest) Query tweets using REST API into MongoDB collection
+twitter2mongodb(options)
+	.then(data => {
+		console.log(data);
+	}).catch(err => {
+		console.error(err.message);
+	});
+```
+
+### Stream API
+
+1. Load `.env` file variables
+2. Load `twitter2mongodb`
+3. Create `options` object
+4. Optionally define Twitter API keys and MongoDB connection
+5. Track keyword `twitter` from `POST statuses/filter`
+6. Log the `tweets` when they are received
+7. Execute `twitter2return` with the Stream API options
+
+```
+var twitter2mongodb = require('twitter2mongodb');
+
+// (options) Initialize options object
+var options = {
+	twitter: {},
+	mongodb: {}
+};
+
+// (options_twitter_connection) Twitter API connection keys
+options.twitter.connection =  {
+	consumer_key: '***', // process.env.TWITTER_CONSUMER_KEY
+	consumer_secret: '***', // process.env.TWITTER_CONSUMER_SECRET
+	access_token_key: '***', // process.env.TWITTER_ACCESS_TOKEN_SECRET
+	access_token_secret: '***' // process.env.TWITTER_ACCESS_TOKEN_SECRET
+};
+
+// (options_mongodb_connection) MongoDB connection details
+// Format: 'mongodb://<user>:<password>@<host>:<port>/<database>'
+options.mongodb.connection = 'mongodb://localhost:27017'; // process.env.MONGODB_CONNECTION
+options.mongodb.database = 'test'; // process.env.MONGODB_DATABASE
+options.mongodb.collection = 'twitter_data'; // process.env.MONGODB_COLLECTION
+
+// (options_twitter_connection) Track keyword 'twitter' in path 'POST statuses/filter'
+options.twitter.method = 'stream'; // get, post, or stream
+options.twitter.path = 'statuses/filter'; // api path
+options.twitter.params = {track: 'twitter'}; // query tweets
+
+// (options_mongodb) MongoDB options
+options.mongodb.method = 'insertOne';
+
+// (options_jsonata) Remove jsonata filter
+delete options.jsonata;
+
+// (twitter2mongodb_stream) Stream tweets into MongoDB collection
+var stream = twitter2mongodb(options);
+stream.on('error', function(error) {
+	console.error(error.message);
+});
+```
 
 ## Contributions
 
