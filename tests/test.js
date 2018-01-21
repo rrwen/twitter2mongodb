@@ -55,9 +55,6 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 					method_options: undefined,
 					options: {poolsize: 5},
 					check: function(tweets) {return(true)}
-				},
-				twitter: {
-					method: 'get'
 				}
 			})
 				.then(data => {
@@ -87,6 +84,7 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 				},
 				mongodb: {
 					method: 'insertMany',
+					method_options: '{}',
 					collection: 'test_insertMany',
 					options: '{"poolsize": 5}'
 				},

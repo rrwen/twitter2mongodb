@@ -2,7 +2,7 @@ TAP version 13
 # Tests for twitter2mongodb (1.0.0)
 # Node.js (v9.2.0)
 # Description: Module for extracting Twitter data to MongoDB databases
-# Date: 2018-01-21 04:41:08
+# Date: 2018-01-21 04:45:56
 # Dependencies: mongodb (^3.0.0-rc0), twitter2return (^1.0.4)
 # Developer: coveralls (^3.0.0), documentation (^5.3.3), dotenv (^4.0.0), istanbul (^0.4.5), moment (^2.19.1), tape (^4.8.0)
 ok 1 (MAIN) MongoDB connect
