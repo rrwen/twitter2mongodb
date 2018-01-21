@@ -32,8 +32,14 @@ const Client = require('mongodb').MongoClient;
  * @param {string} [options.mongodb.database=process.env.MONGODB_DATABASE || 'test'] MongoDB {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Db database name}.
  * @param {string} [options.mongodb.collection=process.env.MONGODB_COLLECTION || 'twitter_data'] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} name.
  * @param {string|Object} [options.mongodb.options=process.env.MONGODB_OPTIONS] Mongodb client {@link https://mongodb.github.io/node-mongodb-native/3.0/api/MongoClient.html#.connect connect options}.
-  * @param {string} [options.mongodb.method=process.env.MONGODB_METHOD||'insertOne'] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} method.
-  * @param {string|Object} [options.mongodb.method_options=process.env.MONGODB_METHOD_OPTIONS] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} method options relative to `options.mongodb.method`.
+ * @param {string} [options.mongodb.method=process.env.MONGODB_METHOD||'insertOne'] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} method.
+ * @param {string|Object} [options.mongodb.method_options=process.env.MONGODB_METHOD_OPTIONS] Mongodb {@link https://mongodb.github.io/node-mongodb-native/3.0/api/Collection collection} method options relative to `options.mongodb.method`.
+ * @param {function} [options.mongodb.check=function(tweets){return(true)};] a function that performs a true or false test to determine whether to insert the tweet or not
+ *
+ * * `options.mongodb.check` is in the form of `function(tweets) {return (true || false)};`
+ * * `tweets` is a {@link https://www.npmjs.com/package/twitter tweets} object for checking
+ * * Return `true` to insert the data into MongoDB or `false` to skip insertion
+ *
  * @param {string} [options.jsonata=process.env.JSONATA] {@link https://www.npmjs.com/package/jsonata jsonata} query for the received tweet object in JSON format before inserting into the MongoDB collection (`options.mongodb.collection`).
  *
  * @returns {(Promise|stream)} Returns a stream if `options.twitter.method` is 'stream', otherwise returns a Promise:
@@ -130,6 +136,7 @@ module.exports = options => {
 	options.mongodb.options = options.mongodb.options || process.env.MONGODB_OPTIONS;
 	options.mongodb.method = options.mongodb.method || process.env.MONGODB_METHOD || 'insertOne';
 	options.mongodb.method_options = options.mongodb.method_options || process.env.MONGODB_METHOD_OPTIONS;
+	options.mongodb.check = options.mongodb.check || function(tweets) {return(true);};
 	if (typeof options.mongodb.options == 'string') {
 		options.mongodb.options = JSON.parse(options.mongodb.options);
 	}
@@ -137,39 +144,43 @@ module.exports = options => {
 		options.mongodb.method_options = JSON.parse(options.mongodb.method_options);
 	}
 	
-	// (mongodb_connect) Connection options for mongodb
-	var mongoClient, mongoDB, mongoCollection;
-	if (typeof options.mongodb.connection == 'string') {
-		Client.connect(options.mongodb.connection, function(err, client) {
-			
-			// (mongodb_connect_error) Unable to connect
-			if (err) {
-				throw err;
-			}
-			
-			// (mongodb_connect_pool) Create mongodb client pool
-			mongoClient = client;
-			mongoDB = client.db(options.mongodb.database);
-			if (options.mongodb.collection instanceof mongoDB.collection) {
-				mongoCollection = options.mongodb.collection;
-			} else {
-				mongoCollection = mongoDB.collection(options.mongodb.collection);
-			}
-		});
-	}
-	
-	// (twitter_stream) Streaming API
+	// (twitter_defaults) Default options for twitter
 	options.twitter = options.twitter || {};
 	options.twitter.method = options.twitter.method || 'get';
+	
+	// (twitter_stream) Streaming API
 	if (options.twitter.method == 'stream') {
+		
+		// (mongodb_connect) Connection options for mongodb
+		var mongoClient, mongoDB, mongoCollection;
+		if (typeof options.mongodb.collection == 'string') {
+			Client.connect(options.mongodb.connection, function(err, client) {
+				
+				// (mongodb_connect_error) Unable to connect
+				if (err) {
+					throw err;
+				}
+				
+				// (mongodb_connect_pool) Create mongodb client pool
+				mongoClient = client;
+				mongoDB = mongoClient.db(options.mongodb.database);
+				if (options.mongodb.collection instanceof mongoDB.collection) {
+					mongoCollection = options.mongodb.collection;
+				} else {
+					mongoCollection = mongoDB.collection(options.mongodb.collection);
+				}
+			});
+		}
 		
 		// (twitter_stream_mongodb) Insert tweets into collection as docs
 		var streamCallback = options.twitter.stream || function(err, data) {};
 		options.twitter.stream = function(err, data) {
-			mongoCollection[options.mongodb.method](data.twitter.tweets, options.mongodb.method_options, function(err, res) {
-				data.mongodb = {client: mongoClient, collection: mongoCollection, db: mongoDB, results: res};
-				streamCallback(err, data);
-			});
+			if (mongoCollection && options.mongodb.check(data.twitter.tweets)) {
+				mongoCollection[options.mongodb.method](data.twitter.tweets, options.mongodb.method_options, function(err, res) {
+					data.mongodb = {client: mongoClient, collection: mongoCollection, db: mongoDB, results: res};
+					streamCallback(err, data);
+				});
+			}
 		};
 		
 		// (twitter_stream_return) Return twitter stream
@@ -178,15 +189,42 @@ module.exports = options => {
 	} else {
 		
 		// (twitter_rest) REST API
-		return twitter2return(options)
-			.then(data => {
+		return Client.connect(options.mongodb.connection)
+			.then(client => {
 				
-				// (twitter_promise_return) Return mongodb promise
-				return mongoCollection[options.mongodb.method](data.twitter.tweets, options.mongodb.method_options)
-					.then(res => {
-						data.mongodb = {client: mongoClient, collection: mongoCollection, db: mongoDB, results: res};
-						return data;
+				// (mongodb_connect_pool) Create mongodb client pool
+				var db = client.db(options.mongodb.database);
+				var collection;
+				if (options.mongodb.collection instanceof db.collection) {
+					collection = options.mongodb.collection;
+				} else {
+					collection = db.collection(options.mongodb.collection);
+				}
+				return {client: client, db: db, collection: collection};
+			})
+			.then(mongo => {
+				return twitter2return(options)
+					.then(data => {
+						
+						// (twitter_promise_true) Return mongodb promise
+						if (options.mongodb.check(data.twitter.tweets)) {
+							return mongo.collection[options.mongodb.method](data.twitter.tweets, options.mongodb.method_options)
+								.then(res => {
+									data.mongodb = {client: mongo.client, collection: mongo.collection, db: mongo.db, results: res};
+									return data;
+								});
+						} else {
+							
+							// (twitter_promise_false) Fail check return data but do not insert
+							data.mongodb = {client: mongo.client, collection: mongo.collection, db: mongo.db};
+							return data;
+						}
 					});
+			})
+			.catch(err => {
+				
+				// (mongodb_connect_error) Unable to connect
+				throw err;
 			});
 	}
 };

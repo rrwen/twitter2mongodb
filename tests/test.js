@@ -50,7 +50,15 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 			// (test_rest_insertone) Insert searched tweets as one object
 			return twitter2mongodb({
 				mongodb: {
-					options: {poolsize: 5}
+					connection: process.env.MONGODB_CONNECTION,
+					collection: process.env.MONGODB_COLLECTION,
+					database: process.env.MONGODB_DATABASE,
+					method_options: undefined,
+					options: {poolsize: 5},
+					check: function(tweets) {return(true)}
+				},
+				twitter: {
+					method: 'get'
 				}
 			})
 				.then(data => {
@@ -69,7 +77,7 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 					t.fail('(A) REST GET search/tweets to insertOne: ' + err.message);
 				});
 		})
-		.then(() => {
+		.then(data => {
 			
 			// (test_rest_insertmany) Insert searched tweets as array filtering for statuses
 			return twitter2mongodb({

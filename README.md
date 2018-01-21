@@ -12,15 +12,19 @@ Module for extracting Twitter data to MongoDB databases
 [![Coverage Status](https://coveralls.io/repos/github/rrwen/twitter2mongodb/badge.svg?branch=master)](https://coveralls.io/github/rrwen/twitter2mongodb?branch=master)
 [![npm](https://img.shields.io/npm/dt/twitter2mongodb.svg)](https://www.npmjs.com/package/twitter2mongodb)
 [![GitHub license](https://img.shields.io/github/license/rrwen/twitter2mongodb.svg)](https://github.com/rrwen/twitter2mongodb/blob/master/LICENSE)
+[![Donarbox Donate](https://img.shields.io/badge/donate-Donarbox-yellow.svg)](https://donorbox.org/rrwen)
+[![PayPal Donate](https://img.shields.io/badge/donate-PayPal-yellow.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NQNSAHK5X46D2)
 [![Twitter](https://img.shields.io/twitter/url/https/github.com/rrwen/twitter2mongodb.svg?style=social)](https://twitter.com/intent/tweet?text=Module%20for%20extracting%20Twitter%20data%20to%20MongoDB%20databases:%20https%3A%2F%2Fgithub.com%2Frrwen%2Ftwitter2mongodb%20%23nodejs%20%23npm)
 
 ## Install
 
 1. Install [Node.js](https://nodejs.org/en/)
 2. Install [twitter2mongodb](https://www.npmjs.com/package/twitter2mongodb) via `npm`
+3. **Recommended**: Install [dotenv](https://www.npmjs.com/package/dotenv)
 
 ```
 npm install --save twitter2mongodb
+npm install --save dotenv
 ```
 
 For the latest developer version, see [Developer Install](#developer-install).
@@ -48,7 +52,7 @@ MONGODB_DATABASE=test
 MONGODB_COLLECTION=twitter_data
 ```
 
-The `.env` file above can be loaded using [dotenv](https://www.npmjs.com/package/dotenv) (`npm install --save dotenv`):
+The `.env` file above can be loaded using [dotenv](https://www.npmjs.com/package/dotenv):
 
 ```javascript
 require('dotenv').config();
@@ -76,20 +80,6 @@ var options = {
 	twitter: {},
 	mongodb: {}
 };
-
-// (options_twitter_connection) Twitter API connection keys
-options.twitter.connection =  {
-	consumer_key: '***', // process.env.TWITTER_CONSUMER_KEY
-	consumer_secret: '***', // process.env.TWITTER_CONSUMER_SECRET
-	access_token_key: '***', // process.env.TWITTER_ACCESS_TOKEN_SECRET
-	access_token_secret: '***' // process.env.TWITTER_ACCESS_TOKEN_SECRET
-};
-
-// (options_mongodb_connection) MongoDB connection details
-// Format: 'mongodb://<user>:<password>@<host>:<port>/<database>'
-options.mongodb.connection = 'mongodb://localhost:27017'; // process.env.MONGODB_CONNECTION
-options.mongodb.database = 'test'; // process.env.MONGODB_DATABASE
-options.mongodb.collection = 'twitter_data'; // process.env.MONGODB_COLLECTION
 
 // (options_twitter_rest) Search for keyword 'twitter' in path 'GET search/tweets'
 options.twitter.method = 'get'; // get, post, or stream
@@ -132,20 +122,6 @@ var options = {
 	mongodb: {}
 };
 
-// (options_twitter_connection) Twitter API connection keys
-options.twitter.connection =  {
-	consumer_key: '***', // process.env.TWITTER_CONSUMER_KEY
-	consumer_secret: '***', // process.env.TWITTER_CONSUMER_SECRET
-	access_token_key: '***', // process.env.TWITTER_ACCESS_TOKEN_SECRET
-	access_token_secret: '***' // process.env.TWITTER_ACCESS_TOKEN_SECRET
-};
-
-// (options_mongodb_connection) MongoDB connection details
-// Format: 'mongodb://<user>:<password>@<host>:<port>/<database>'
-options.mongodb.connection = 'mongodb://localhost:27017'; // process.env.MONGODB_CONNECTION
-options.mongodb.database = 'test'; // process.env.MONGODB_DATABASE
-options.mongodb.collection = 'twitter_data'; // process.env.MONGODB_COLLECTION
-
 // (options_twitter_connection) Track keyword 'twitter' in path 'POST statuses/filter'
 options.twitter.method = 'stream'; // get, post, or stream
 options.twitter.path = 'statuses/filter'; // api path
@@ -166,51 +142,10 @@ stream.on('error', function(error) {
 
 ## Contributions
 
-### Report Contributions
+1. Reports for issues and suggestions can be made using the [issue submission](https://github.com/rrwen/twitter2mongodb/issues) interface.
+2. Code contributions are submitted via [pull requests](https://github.com/rrwen/twitter2mongodb/pulls)
 
-Reports for issues and suggestions can be made using the [issue submission](https://github.com/rrwen/twitter2mongodb/issues) interface.
-
-When possible, ensure that your submission is:
-
-* **Descriptive**: has informative title, explanations, and screenshots
-* **Specific**: has details of environment (such as operating system and hardware) and software used
-* **Reproducible**: has steps, code, and examples to reproduce the issue
-
-### Code Contributions
-
-Code contributions are submitted via [pull requests](https://help.github.com/articles/about-pull-requests/):
-
-1. Ensure that you pass the [Tests](#tests)
-2. Create a new [pull request](https://github.com/rrwen/twitter2mongodb/pulls)
-3. Provide an explanation of the changes
-
-A template of the code contribution explanation is provided below:
-
-```
-## Purpose
-
-The purpose can mention goals that include fixes to bugs, addition of features, and other improvements, etc.
-
-## Description
-
-The description is a short summary of the changes made such as improved speeds or features, and implementation details.
-
-## Changes
-
-The changes are a list of general edits made to the files and their respective components.
-* `file_path1`:
-    * `function_module_etc`: changed loop to map
-    * `function_module_etc`: changed variable value
-* `file_path2`:
-    * `function_module_etc`: changed loop to map
-    * `function_module_etc`: changed variable value
-
-## Notes
-
-The notes provide any additional text that do not fit into the above sections.
-```
-
-For more information, see [Developer Install](#developer-install) and [Implementation](#implementation).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ## Developer Notes
 
