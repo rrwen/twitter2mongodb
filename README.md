@@ -129,9 +129,7 @@ options.twitter.params = {track: 'twitter'}; // query tweets
 
 // (options_mongodb) MongoDB options
 options.mongodb.method = 'insertOne';
-
-// (options_jsonata) Remove jsonata filter
-delete options.jsonata;
+options.mongodb.check = function(tweets) {return(true)}; // only insert if returns true
 
 // (twitter2mongodb_stream) Stream tweets into MongoDB collection
 var stream = twitter2mongodb(options);
