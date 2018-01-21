@@ -51,7 +51,6 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 			return twitter2mongodb({
 				mongodb: {
 					connection: process.env.MONGODB_CONNECTION,
-					collection: process.env.MONGODB_COLLECTION,
 					database: process.env.MONGODB_DATABASE,
 					method_options: undefined,
 					options: {poolsize: 5},
@@ -107,6 +106,40 @@ test('Tests for ' + json.name + ' (' + json.version + ')', t => {
 				.catch(err => {
 					
 					// (test_rest_insertmany_fail) Fail if inconsistent with database or error
+					t.fail('(A) REST GET search/tweets to insertMany: ' + err.message);
+				});
+		})
+		.then(data => {
+			
+			// (test_rest_check) Insert searched tweets as array filtering for statuses with always false check
+			return twitter2mongodb({
+				twitter: {
+					method: 'get',
+					path: 'search/tweets',
+					params: {q: 'twitter'}
+				},
+				mongodb: {
+					method: 'insertMany',
+					collection: 'test_check',
+					options: '{"poolsize": 5}',
+					check: function(tweets){return(false);}
+				},
+				jsonata: 'statuses'
+			})
+				.then(data => {
+					
+					// (test_rest_check_pass) Pass if consistent with database
+					return data.mongodb.collection.find({}).toArray()
+						.then(docs => {
+							var actual = [];
+							var expected = docs;
+							t.deepEquals(actual, expected, '(A) REST GET search/tweets to insertMany with false check');
+							return data;
+						});
+				})
+				.catch(err => {
+					
+					// (test_rest_check_fail) Fail if inconsistent with database or error
 					t.fail('(A) REST GET search/tweets to insertMany: ' + err.message);
 				});
 		})

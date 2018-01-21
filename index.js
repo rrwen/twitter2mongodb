@@ -158,14 +158,12 @@ module.exports = options => {
 			
 			// (mongodb_connect_pool) Create mongodb client pool
 			mongoClient = client;
+			
+			// (mongodb_connect_database) Create mongodb database
 			mongoDB = mongoClient.db(options.mongodb.database);
 			
 			// (mongodb_connect_collection) Create mongodb collection
-			if (options.mongodb.collection instanceof mongoDB.collection) {
-				mongoCollection = options.mongodb.collection;
-			} else {
-				mongoCollection = mongoDB.collection(options.mongodb.collection);
-			}
+			mongoCollection = mongoDB.collection(options.mongodb.collection);
 		});
 		
 		// (twitter_stream_mongodb) Insert tweets into collection as docs
@@ -188,16 +186,11 @@ module.exports = options => {
 		return Client.connect(options.mongodb.connection)
 			.then(client => {
 				
-				// (mongodb_connect_pool) Create mongodb client pool
+				// (mongodb_connect_database) Create mongodb database
 				var db = client.db(options.mongodb.database);
 				
 				// (mongodb_connect_collection) Create mongodb collection
-				var collection;
-				if (options.mongodb.collection instanceof db.collection) {
-					collection = options.mongodb.collection;
-				} else {
-					collection = db.collection(options.mongodb.collection);
-				}
+				var collection = db.collection(options.mongodb.collection);
 				return {client: client, db: db, collection: collection};
 			})
 			.then(mongo => {
