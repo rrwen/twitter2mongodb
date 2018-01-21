@@ -151,26 +151,22 @@ module.exports = options => {
 	// (twitter_stream) Streaming API
 	if (options.twitter.method == 'stream') {
 		
-		// (mongodb_connect) Connection options for mongodb
+		// (mongodb_connect) Connect to mongodb
 		var mongoClient, mongoDB, mongoCollection;
-		if (typeof options.mongodb.collection == 'string') {
-			Client.connect(options.mongodb.connection, function(err, client) {
-				
-				// (mongodb_connect_error) Unable to connect
-				if (err) {
-					throw err;
-				}
-				
-				// (mongodb_connect_pool) Create mongodb client pool
-				mongoClient = client;
-				mongoDB = mongoClient.db(options.mongodb.database);
-				if (options.mongodb.collection instanceof mongoDB.collection) {
-					mongoCollection = options.mongodb.collection;
-				} else {
-					mongoCollection = mongoDB.collection(options.mongodb.collection);
-				}
-			});
-		}
+		Client.connect(options.mongodb.connection, function(err, client) {
+			if (err) throw err;
+			
+			// (mongodb_connect_pool) Create mongodb client pool
+			mongoClient = client;
+			mongoDB = mongoClient.db(options.mongodb.database);
+			
+			// (mongodb_connect_collection) Create mongodb collection
+			if (options.mongodb.collection instanceof mongoDB.collection) {
+				mongoCollection = options.mongodb.collection;
+			} else {
+				mongoCollection = mongoDB.collection(options.mongodb.collection);
+			}
+		});
 		
 		// (twitter_stream_mongodb) Insert tweets into collection as docs
 		var streamCallback = options.twitter.stream || function(err, data) {};
@@ -194,6 +190,8 @@ module.exports = options => {
 				
 				// (mongodb_connect_pool) Create mongodb client pool
 				var db = client.db(options.mongodb.database);
+				
+				// (mongodb_connect_collection) Create mongodb collection
 				var collection;
 				if (options.mongodb.collection instanceof db.collection) {
 					collection = options.mongodb.collection;

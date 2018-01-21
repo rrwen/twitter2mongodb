@@ -2,7 +2,7 @@ TAP version 13
 # Tests for twitter2mongodb (1.0.0)
 # Node.js (v9.2.0)
 # Description: Module for extracting Twitter data to MongoDB databases
-# Date: 2018-01-21 04:12:41
+# Date: 2018-01-21 04:18:12
 # Dependencies: mongodb (^3.0.0-rc0), twitter2return (^1.0.4)
 # Developer: coveralls (^3.0.0), documentation (^5.3.3), dotenv (^4.0.0), istanbul (^0.4.5), moment (^2.19.1), tape (^4.8.0)
 ok 1 (MAIN) MongoDB connect
@@ -12,4 +12,10 @@ ok 3 (A) REST GET search/tweets to insertMany
 # (B) tests on Twitter Stream API
 ok 4 (B) STREAM POST statuses/filter to insertOne
 ok 5 (B) STREAM POST statuses/filter to insertOne
-ok 6 (MAIN) MongoDB drop database
+ok 6 (B) STREAM POST statuses/filter to insertOne
+ok 7 (B) STREAM POST statuses/filter to insertOne
+ok 8 (B) STREAM POST statuses/filter to insertOne
+ok 9 (B) STREAM POST statuses/filter to insertOne
+ok 10 (B) STREAM POST statuses/filter to insertOne
+ok 11 (B) STREAM POST statuses/filter to insertOne
+ok 12 (MAIN) MongoDB drop database
