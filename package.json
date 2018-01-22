@@ -1,6 +1,6 @@
 {
   "name": "twitter2mongodb",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Module for extracting Twitter data to MongoDB databases",
   "main": "index.js",
   "scripts": {
@@ -54,6 +54,6 @@
   },
   "dependencies": {
     "mongodb": "^3.0.0-rc0",
-    "twitter2return": "^1.0.4"
+    "twitter2return": "^1.0.7"
   }
 }
